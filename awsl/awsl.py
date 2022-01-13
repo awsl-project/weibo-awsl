@@ -20,7 +20,6 @@ class WbAwsl(object):
         self.max_id = int(awsl_producer.max_id) if awsl_producer.max_id else 0
         self.url = WB_DATA_URL.format(awsl_producer.uid)
         self.keyword = awsl_producer.keyword
-        Tools.init_db()
         _logger.info("awsl init done %s" % awsl_producer)
 
     @staticmethod

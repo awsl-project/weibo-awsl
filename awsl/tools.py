@@ -5,9 +5,15 @@ import requests
 
 from typing import List
 from sqlalchemy.sql import func
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 
-from .models import AwslProducer, Mblog, Pic, Base, DBSession
+from .models.models import AwslProducer, Mblog, Pic
 from .config import CHUNK_SIZE, WB_URL_PREFIX, settings, WB_COOKIE
+
+engine = create_engine(settings.db_url, pool_size=100)
+DBSession = sessionmaker(bind=engine)
+
 
 _logger = logging.getLogger(__name__)
 
@@ -36,13 +42,6 @@ class Tools:
         except Exception as e:
             _logger.exception(e)
             return None
-
-    @staticmethod
-    def init_db() -> None:
-        try:
-            Base.metadata.create_all()
-        except Exception as e:
-            _logger.exception(e)
 
     @staticmethod
     def select_max_id(uid: str) -> int:
