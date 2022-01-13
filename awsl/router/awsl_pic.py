@@ -6,8 +6,9 @@ from fastapi import APIRouter
 from sqlalchemy.sql import func
 from fastapi.responses import JSONResponse
 
-from ..models import DBSession, Mblog, Pic
-from ..config import settings, WB_URL_PREFIX
+from ..tools import DBSession
+from ..models.models import Mblog, Pic
+from ..config import WB_URL_PREFIX
 from .models import Message, PicItem
 
 

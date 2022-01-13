@@ -6,9 +6,9 @@ from fastapi import status
 from fastapi import APIRouter
 from celery import Celery
 
-from ..models import AwslProducer, DBSession
+from ..models.models import AwslProducer
 from ..config import settings, WB_PROFILE
-from ..tools import Tools
+from ..tools import Tools, DBSession
 from .models import ProducerItem, ProducerRes, Message
 
 
