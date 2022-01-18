@@ -4,4 +4,4 @@ COPY . /app
 WORKDIR /app
 RUN python3 -m pip install -r /app/requirements.txt
 RUN rm -rf /root/.cache
-ENTRYPOINT ["python3", "-m", "uvicorn",  "--host", "0.0.0.0", "main:app"]
+ENTRYPOINT ["celery", "-A", "awsl_start", "worker", "--beat", "--loglevel=INFO"]

@@ -1,23 +1,10 @@
 version: "2"
 
 services:
-  awsl-py:
-    # build:
-    #   context: ../
-    #   dockerfile: ./docker/Dockerfile
-    image: registry.cn-beijing.aliyuncs.com/dreamhunter/awsl:2.0
-    container_name: awsl-py
-    environment:
-      ENV_FILE: .env
-    volumes:
-      - ../.env.local:.env
-    ports:
-        - "8000:8000"
 
   awsl-task:
     image: registry.cn-beijing.aliyuncs.com/dreamhunter/awsl:2.0
     container_name: awsl-task
-    entrypoint: celery -A awsl_start worker --beat --loglevel=INFO
     restart: always
     environment:
       ENV_FILE: .env
