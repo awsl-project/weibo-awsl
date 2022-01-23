@@ -1,3 +1,4 @@
+from concurrent.futures import ThreadPoolExecutor
 import re
 import time
 import logging
@@ -25,16 +26,11 @@ class WbAwsl(object):
     @staticmethod
     def start() -> None:
         awsl_producers = Tools.find_all_awsl_producer()
-        threads = []
-        for awsl_producer in awsl_producers:
-            awsl = WbAwsl(awsl_producer)
-            t = threading.Thread(target=awsl.run)
-            threads.append(t)
-            t.start()
 
-        # wating for all task down
-        for t in threads:
-            t.join()
+        with ThreadPoolExecutor(max_workers=settings.max_workers) as executor:
+            for awsl_producer in awsl_producers:
+                awsl = WbAwsl(awsl_producer)
+                executor.submit(awsl.run)
 
         _logger.info("awsl run all awsl_producers done")
 
@@ -50,8 +46,9 @@ class WbAwsl(object):
                     re_mblogid = Tools.update_mblog(self.awsl_producer, wbdata)
                     re_wbdata = Tools.wb_get(WB_SHOW_URL.format(
                         re_mblogid)) if re_mblogid else {}
-                    Tools.send2mq(self.awsl_producer, re_mblogid, re_wbdata)
+                    Tools.send2bot(self.awsl_producer, re_mblogid, re_wbdata)
                     Tools.update_pic(wbdata, re_wbdata)
+                    Tools.send2blob(self.awsl_producer, re_wbdata)
                 except Exception as e:
                     _logger.exception(e)
         except Exception as e:
