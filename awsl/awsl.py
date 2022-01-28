@@ -2,7 +2,6 @@ from concurrent.futures import ThreadPoolExecutor
 import re
 import time
 import logging
-import threading
 
 from .tools import Tools
 
