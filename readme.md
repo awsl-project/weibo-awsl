@@ -13,5 +13,4 @@ db_url=mysql+mysqlconnector://xxx:xxx/xxx(数据库地址)
 broker=xxx://:xxx@localhost:6379/0(MQ)
 pika_url=xxx://:xxx@localhost:6379/0(MQ)
 bot_queue=xxx(MQ)
-blob_queue=xxx(MQ)
 ```

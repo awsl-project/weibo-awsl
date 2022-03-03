@@ -20,7 +20,6 @@ class Settings(BaseSettings):
     broker: str
     pika_url: str
     bot_queue: str
-    blob_queue: str
 
     class Config:
         env_file = os.environ.get("ENV_FILE", ".env")
