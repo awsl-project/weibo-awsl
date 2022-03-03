@@ -28,7 +28,6 @@ def get_channel() -> None:
     connection = pika.BlockingConnection(pika.URLParameters(settings.pika_url))
     channel = connection.channel()
     channel.queue_declare(queue=settings.bot_queue, durable=True)
-    channel.queue_declare(queue=settings.blob_queue, durable=True)
 
 
 class Tools:
@@ -146,22 +145,5 @@ class Tools:
                 )
                 _logger.info("send bot_queue %s", pic_ids[i:i+CHUNK_SIZE])
             _logger.info("send to bot_queue re_mblogid %s", re_mblogid)
-        except Exception as e:
-            _logger.exception(e)
-
-    @staticmethod
-    def send2blob(awsl_producer: AwslProducer, re_wbdata: dict) -> None:
-        try:
-            get_channel()
-            pic_ids = re_wbdata.get("pic_ids", [])
-            if not pic_ids:
-                return
-            channel.basic_publish(
-                exchange='',
-                routing_key=settings.blob_queue,
-                body=json.dumps(pic_ids),
-                properties=pika.BasicProperties(delivery_mode=2)
-            )
-            _logger.info("send blob_queue awsl_producer=%s, pic_ids=%s", awsl_producer.name, pic_ids)
         except Exception as e:
             _logger.exception(e)

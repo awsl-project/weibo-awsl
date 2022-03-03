@@ -47,7 +47,6 @@ class WbAwsl(object):
                         re_mblogid)) if re_mblogid else {}
                     Tools.send2bot(self.awsl_producer, re_mblogid, re_wbdata)
                     Tools.update_pic(wbdata, re_wbdata)
-                    Tools.send2blob(self.awsl_producer, re_wbdata)
                 except Exception as e:
                     _logger.exception(e)
         except Exception as e:
