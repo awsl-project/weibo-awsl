@@ -17,7 +17,6 @@ class Settings(BaseSettings):
     max_page: int
     max_workers: int
     db_url: str
-    broker: str
     pika_url: str
     bot_queue: str
 
