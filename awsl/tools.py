@@ -115,7 +115,13 @@ class Tools:
     def find_all_awsl_producer() -> List[AwslProducer]:
         session = DBSession()
         try:
-            awsl_producers = session.query(AwslProducer).all()
+            awsl_producers = session.query(
+                AwslProducer
+            ).filter(
+                AwslProducer.in_verification.isnot(True)
+            ).filter(
+                AwslProducer.deleted.isnot(True)
+            ).all()
         finally:
             session.close()
         return awsl_producers
@@ -128,7 +134,11 @@ class Tools:
                 re_wbdata["user"]["id"], re_wbdata["mblogid"])
             pic_infos = re_wbdata.get("pic_infos", {})
             pic_ids = re_wbdata.get("pic_ids", [])
-            source_screen_name = re_wbdata.get("user", {}).get("screen_name") or awsl_producer.name
+            source_screen_name = re_wbdata.get(
+                "user", {}
+            ).get(
+                "screen_name"
+            ) or awsl_producer.name
             for i in range(0, len(pic_ids), CHUNK_SIZE):
                 channel.basic_publish(
                     exchange='',
