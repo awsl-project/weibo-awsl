@@ -1,6 +1,6 @@
 # weibo 爬虫
 
-本爬虫仅供学习交流，请不要非法使用（后果自负
+> 本爬虫仅供学习交流，请不要非法使用（后果自负
 
 自动爬取某个微博博主转发的微博，根据关键词匹配，记录匹配到的微博的图片
 
@@ -12,4 +12,13 @@ max_page=10(爬取的最大页数)
 db_url=mysql+mysqlconnector://xxx:xxx/xxx(数据库地址)
 pika_url=xxx://:xxx@localhost:6379/0(MQ)
 bot_queue=xxx(MQ)
+```
+
+运行
+
+```bash
+python3 -m venv venv
+source venv/bin/activate
+python3 -m pip install -r requirements.txt
+python3 main.py
 ```

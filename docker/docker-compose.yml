@@ -1,12 +1,10 @@
-version: "2"
-
 services:
-
   awsl-task:
-    image: registry.cn-beijing.aliyuncs.com/dreamhunter/awsl:2.0
+    build:
+      context: ..
+      dockerfile: docker/dockerfile
+    image: awsl-task
     container_name: awsl-task
     restart: always
     environment:
       ENV_FILE: .env
-    volumes:
-      - ../.env.local:.env

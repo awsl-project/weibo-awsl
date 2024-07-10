@@ -21,8 +21,10 @@ _logger = logging.getLogger(__name__)
 channel = None
 
 
-def get_channel() -> None:
+def check_pika_channel() -> None:
     global channel
+    if not settings.pika_url or not settings.bot_queue:
+        return
     if channel is not None and channel.is_open:
         return
     connection = pika.BlockingConnection(pika.URLParameters(settings.pika_url))
@@ -129,7 +131,9 @@ class Tools:
     @staticmethod
     def send2bot(awsl_producer: AwslProducer, re_mblogid: str, re_wbdata: dict) -> None:
         try:
-            get_channel()
+            check_pika_channel()
+            if not channel:
+                return
             wb_url = WB_URL_PREFIX.format(
                 re_wbdata["user"]["id"], re_wbdata["mblogid"])
             pic_infos = re_wbdata.get("pic_infos", {})
