@@ -14,8 +14,7 @@ CHUNK_SIZE = 9
 
 class Settings(BaseSettings):
     cookie_sub: str = ""
-    max_page: int = ""
-    max_workers: int = 5
+    max_page: int = 50
     db_url: str = ""
     pika_url: str = ""
     bot_queue: str = ""

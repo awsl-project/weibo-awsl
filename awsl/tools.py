@@ -1,12 +1,14 @@
 import json
 import pika
 import logging
-import requests
+import httpx
 
 from typing import List
 from sqlalchemy.sql import func
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+
+from .pydantic_models import WeiboListItem
 
 from .models.models import AwslProducer, Mblog, Pic
 from .config import CHUNK_SIZE, WB_URL_PREFIX, settings, WB_COOKIE
@@ -37,9 +39,10 @@ class Tools:
     @staticmethod
     def wb_get(url) -> dict:
         try:
-            res = requests.get(url=url, headers={
+            res = httpx.get(url=url, headers={
                 "cookie": WB_COOKIE.format(settings.cookie_sub)
             })
+            res.raise_for_status()
             return res.json()
         except Exception as e:
             _logger.exception(e)
@@ -47,76 +50,63 @@ class Tools:
 
     @staticmethod
     def select_max_id(uid: str) -> int:
-        session = DBSession()
-        try:
+        with DBSession() as session:
             mblog = session.query(func.max(Mblog.id)).filter(
                 Mblog.uid == uid).one()
-        finally:
-            session.close()
-        return int(mblog[0]) if mblog and mblog[0] else 0
+            return int(mblog[0]) if mblog and mblog[0] else 0
 
     @staticmethod
     def update_max_id(uid: str, max_id: int) -> None:
-        session = DBSession()
-        try:
+        with DBSession() as session:
             session.query(AwslProducer).filter(
                 AwslProducer.uid == uid
             ).update({
                 AwslProducer.max_id: str(max_id)
             })
             session.commit()
-        finally:
-            session.close()
 
     @staticmethod
-    def update_mblog(awsl_producer: AwslProducer, wbdata: dict) -> str:
+    def update_mblog(awsl_producer: AwslProducer, wbdata: WeiboListItem) -> str:
         if not wbdata:
             return ""
-        origin_wbdata = wbdata.get("retweeted_status") or wbdata
-        if not origin_wbdata.get("user"):
+        origin_wbdata = wbdata.retweeted_status or wbdata
+        if not origin_wbdata.user:
             return ""
         _logger.info("awsl update db mblog awsl_producer=%s id=%s mblogid=%s" %
-                     (awsl_producer.name, wbdata["id"], wbdata["mblogid"]))
-        session = DBSession()
-        try:
+                     (awsl_producer.name, wbdata.id, wbdata.mblogid))
+        with DBSession() as session:
             mblog = Mblog(
-                id=wbdata["id"],
+                id=wbdata.id,
                 uid=awsl_producer.uid,
-                mblogid=wbdata["mblogid"],
-                re_id=origin_wbdata["id"],
-                re_mblogid=origin_wbdata["mblogid"],
-                re_user_id=origin_wbdata["user"]["id"],
-                re_user=json.dumps(origin_wbdata["user"])
+                mblogid=wbdata.mblogid,
+                re_id=origin_wbdata.id,
+                re_mblogid=origin_wbdata.mblogid,
+                re_user_id=origin_wbdata.user["id"],
+                re_user=json.dumps(origin_wbdata.user)
             )
             session.add(mblog)
             session.commit()
-        finally:
-            session.close()
 
-        return origin_wbdata["mblogid"]
+        return origin_wbdata.mblogid
 
     @staticmethod
-    def update_pic(wbdata: dict, re_wbdata: dict) -> None:
+    def update_pic(wbdata: WeiboListItem, re_wbdata: dict) -> None:
         if not re_wbdata:
             return
         pic_infos = re_wbdata.get("pic_infos", {})
-        session = DBSession()
-        try:
+        with DBSession() as session:
             for sequence, pic_id in enumerate(re_wbdata.get("pic_ids", [])):
                 session.add(Pic(
-                    awsl_id=wbdata["id"],
+                    awsl_id=wbdata.id,
                     sequence=sequence,
                     pic_id=pic_id,
                     pic_info=json.dumps(pic_infos[pic_id]),
                 ))
             session.commit()
-        finally:
-            session.close()
 
     @staticmethod
     def find_all_awsl_producer() -> List[AwslProducer]:
-        session = DBSession()
-        try:
+        with DBSession() as session:
             awsl_producers = session.query(
                 AwslProducer
             ).filter(
@@ -124,9 +114,7 @@ class Tools:
             ).filter(
                 AwslProducer.deleted.isnot(True)
             ).all()
-        finally:
-            session.close()
-        return awsl_producers
+            return awsl_producers
 
     @staticmethod
     def send2bot(awsl_producer: AwslProducer, re_mblogid: str, re_wbdata: dict) -> None:
