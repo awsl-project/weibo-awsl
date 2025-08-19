@@ -7,11 +7,11 @@
 创建 .env 文件
 
 ```env
-cookie_sub=xxx
-max_page=10(爬取的最大页数)
-db_url=mysql+mysqlconnector://xxx:xxx/xxx(数据库地址)
-pika_url=xxx://:xxx@localhost:6379/0(MQ)
-bot_queue=xxx(MQ)
+headers={}
+max_page=50
+db_url=mysql+mysqlconnector://xxx:xxx/xxx
+pika_url=xxx://:xxx@localhost:6379/0
+bot_queue=xxx
 ```
 
 运行

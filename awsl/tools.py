@@ -11,7 +11,7 @@ from sqlalchemy.orm import sessionmaker
 from .pydantic_models import WeiboListItem
 
 from .models.models import AwslProducer, Mblog, Pic
-from .config import CHUNK_SIZE, WB_URL_PREFIX, settings, WB_COOKIE
+from .config import CHUNK_SIZE, WB_URL_PREFIX, settings
 
 engine = create_engine(settings.db_url, pool_size=100)
 DBSession = sessionmaker(bind=engine)
@@ -39,9 +39,7 @@ class Tools:
     @staticmethod
     def wb_get(url) -> dict:
         try:
-            res = httpx.get(url=url, headers={
-                "cookie": WB_COOKIE.format(settings.cookie_sub)
-            })
+            res = httpx.get(url=url, headers=settings.headers)
             res.raise_for_status()
             return res.json()
         except Exception as e:

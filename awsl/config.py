@@ -1,19 +1,18 @@
 import os
+from typing import Dict
 
 from pydantic_settings import BaseSettings
 
 
 WB_DATA_URL = "https://weibo.com/ajax/statuses/mymblog?uid={}&page="
 WB_SHOW_URL = "https://weibo.com/ajax/statuses/show?id={}"
-WB_COOKIE = "SUB={}"
 WB_PROFILE = "https://weibo.com/ajax/profile/info?uid={}"
 WB_URL_PREFIX = "https://weibo.com/{}/{}"
-WB_COOKIE = "SUB={}"
 CHUNK_SIZE = 9
 
 
 class Settings(BaseSettings):
-    cookie_sub: str = ""
+    headers: Dict[str, str] = {}
     max_page: int = 50
     db_url: str = ""
     pika_url: str = ""
