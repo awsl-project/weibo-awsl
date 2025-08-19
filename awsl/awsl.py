@@ -22,15 +22,18 @@ class WbAwsl(object):
         self.max_id = int(awsl_producer.max_id) if awsl_producer.max_id else Tools.select_max_id(self.uid)
         self.url = WB_DATA_URL.format(awsl_producer.uid)
         self.keyword = awsl_producer.keyword
-        _logger.info("awsl init done %s" % awsl_producer)
+        _logger.info("awsl init done %s" % awsl_producer.uid)
 
     @staticmethod
     def start() -> None:
         awsl_producers = Tools.find_all_awsl_producer()
+        len_awsl_producers = len(awsl_producers)
 
-        for awsl_producer in awsl_producers:
+        for i, awsl_producer in enumerate(awsl_producers):
+            _logger.info(f"start crawl {i}/{len_awsl_producers}: {awsl_producer.uid}")
             awsl = WbAwsl(awsl_producer)
             awsl.run()
+            time.sleep(10)
 
         _logger.info("awsl run all awsl_producers done")
 
